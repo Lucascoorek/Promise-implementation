@@ -6,6 +6,18 @@ async function promiseAll(promises) {
   return results;
 }
 
+function promiseRace(promises) {
+  return new Promise((resolve, reject) => {
+    for (const promise of promises) {
+      if (promise.then) {
+        promise.then(resolve, reject);
+      } else {
+        return resolve(promise);
+      }
+    }
+  });
+}
+
 //Kod testowy.
 promiseAll([]).then(result => {
   console.log("To powinien być []:", JSON.stringify(result));
@@ -27,18 +39,6 @@ promiseAll([futureSuccess(1), Promise.reject("X"), futureSuccess(3)])
     }
     console.log("To powinien być X:", error);
   });
-
-function promiseRace(promises) {
-  return new Promise((resolve, reject) => {
-    for (const promise of promises) {
-      if (promise.then) {
-        promise.then(resolve, reject);
-      } else {
-        return resolve(promise);
-      }
-    }
-  });
-}
 
 promiseRace([1, 2, 3]).then(result => {
   console.log("This should be 1:", result);
