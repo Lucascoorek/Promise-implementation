@@ -1,47 +1,43 @@
-// async function promiseAll(promises) {
-//   const results = [];
-//   for (const p of promises) {
-//     results.push(await p);
-//   }
-//   return results;
-// }
-
-// async function promiseRace(promises) {
-//   let res;
-//   for (const p of promises) {
-//     res = await p;
-//   }
-//   return res;
-// }
-
-// Kod testowy.
-// promiseAll([]).then(result => {
-//   console.log("To powinien być []:", JSON.stringify(result));
-// });
-
-// promiseAll([futureSuccess(1), futureSuccess(2), futureSuccess(3)]).then(
-//   result => {
-//     console.log("To powinien być [1, 2, 3]:", result);
-//   }
-// );
-
-// promiseAll([futureSuccess(1), Promise.reject("X"), futureSuccess(3)])
-//   .then(() => {
-//     console.log("WAT?! Nie powinno nas tu być..");
-//   })
-//   .catch(error => {
-//     if (error !== "X") {
-//       console.log("Coś poszło nie tak..:", error);
-//     }
-//     console.log("To powinien być X:", error);
-//   });
-
-async function promiseRace(promises) {
+async function promiseAll(promises) {
   const results = [];
   for (const p of promises) {
     results.push(await p);
   }
-  return results[0];
+  return results;
+}
+
+//Kod testowy.
+promiseAll([]).then(result => {
+  console.log("To powinien być []:", JSON.stringify(result));
+});
+
+promiseAll([futureSuccess(1), futureSuccess(2), futureSuccess(3)]).then(
+  result => {
+    console.log("To powinien być [1, 2, 3]:", result);
+  }
+);
+
+promiseAll([futureSuccess(1), Promise.reject("X"), futureSuccess(3)])
+  .then(() => {
+    console.log("WAT?! Nie powinno nas tu być..");
+  })
+  .catch(error => {
+    if (error !== "X") {
+      console.log("Coś poszło nie tak..:", error);
+    }
+    console.log("To powinien być X:", error);
+  });
+
+function promiseRace(promises) {
+  return new Promise((resolve, reject) => {
+    for (const promise of promises) {
+      if (promise.then) {
+        promise.then(resolve, reject);
+      } else {
+        return resolve(promise);
+      }
+    }
+  });
 }
 
 promiseRace([1, 2, 3]).then(result => {
